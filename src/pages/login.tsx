@@ -1,21 +1,56 @@
 import Link from 'next/link';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import styled from 'styled-components';
 
 import type { NextPage } from 'next';
-import type { ChangeEvent } from 'react';
-import type { TLoginInput } from '@Type/login';
+import type { ChangeEvent, FocusEvent } from 'react';
+
+const iDPattern = new RegExp('^[0-9|a-z|A-Z]{4,29}$');
+const pwdPattern = new RegExp('^.*(?=^.{8,29}$)(?=.*d)(?=.*[a-zA-Z])(?=.*[0-9]).*$');
 
 const LoginPage: NextPage = () => {
-  const [input, setInput] = useState<TLoginInput>({
+  const [input, setInput] = useState({
     id: '',
     pwd: '',
   });
 
+  const [activeDesc, setActiveDesc] = useState({
+    id: true,
+    pwd: true,
+  });
+
   const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
     setInput({ ...input, [e.target.name]: e.target.value });
+
+    if (e.target.name === 'id' && iDPattern.test(e.target.value) && !activeDesc.id) {
+      setActiveDesc({ ...activeDesc, id: true });
+    }
+
+    if (e.target.name === 'pwd' && pwdPattern.test(e.target.value) && !activeDesc.pwd) {
+      setActiveDesc({ ...activeDesc, pwd: true });
+    }
   };
+
+  const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {
+    if (e.target.name === 'id') {
+      if (!iDPattern.test(input.id)) {
+        setActiveDesc({ ...activeDesc, id: false });
+      }
+    }
+
+    if (e.target.name === 'pwd') {
+      if (!pwdPattern.test(input.pwd)) {
+        setActiveDesc({ ...activeDesc, pwd: false });
+      }
+    }
+  };
+
+  const isAbleLogin = useMemo(() => {
+    if (!input.id || !input.pwd) return false;
+    if (activeDesc.id && activeDesc.pwd) return true;
+    return false;
+  }, [activeDesc, input]);
 
   return (
     <>
@@ -29,16 +64,30 @@ const LoginPage: NextPage = () => {
       </Header>
       <Form>
         <TextTitle>아이디</TextTitle>
-        <TextInput type='text' value={input.id} name='id' onChange={handleInput} />
-        <TextDescript isHidden={true}>올바른 아이디 형식으로 입력해주세요.</TextDescript>
+        <TextInput
+          type='text'
+          name='id'
+          value={input.id}
+          onChange={handleInput}
+          onBlur={handleBlur}
+        />
+        <TextDescript isHidden={activeDesc.id}>올바른 아이디 형식으로 입력해주세요.</TextDescript>
 
         <br />
 
         <TextTitle>비밀번호</TextTitle>
-        <TextInput type='password' value={input.pwd} name='pwd' onChange={handleInput} />
-        <TextDescript isHidden={false}>올바른 비밀번호 형식으로 입력해주세요.</TextDescript>
+        <TextInput
+          name='pwd'
+          type='password'
+          value={input.pwd}
+          onChange={handleInput}
+          onBlur={handleBlur}
+        />
+        <TextDescript isHidden={activeDesc.pwd}>
+          올바른 비밀번호 형식으로 입력해주세요.
+        </TextDescript>
 
-        <LoginButton disabled>로그인</LoginButton>
+        <LoginButton disabled={!isAbleLogin}>로그인</LoginButton>
       </Form>
     </>
   );

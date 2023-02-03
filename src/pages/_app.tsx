@@ -1,20 +1,48 @@
 import type { AppProps } from 'next/app';
 import styled from 'styled-components';
 
+import { Hydrate, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { AxiosError } from 'axios';
+import { RecoilRoot } from 'recoil';
+
 import setupMSW from '../api/setup';
 import GlobalStyle from '../styles/GlobalStyle';
 
 setupMSW();
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        retryOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+
+        onError: (err: unknown) => {
+          if (err instanceof AxiosError) {
+            const code = err.response?.data.code;
+            console.error(code);
+          }
+        },
+      },
+    },
+  });
+
   return (
-    <>
-      <GlobalStyle />
-      <Background />
-      <Content>
-        <Component {...pageProps} />
-      </Content>
-    </>
+    <QueryClientProvider client={queryClient}>
+      <Hydrate state={pageProps.dehydratedState}>
+        <RecoilRoot>
+          <GlobalStyle />
+          <Background />
+          <Content>
+            <Component {...pageProps} />
+          </Content>
+        </RecoilRoot>
+      </Hydrate>
+      <ReactQueryDevtools />
+    </QueryClientProvider>
   );
 }
 

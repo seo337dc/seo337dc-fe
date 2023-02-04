@@ -24,7 +24,8 @@
       "@Atom/*": ["src/atom/*"],
       "@Atom": ["src/atom"],
       "@Style": ["src/styles"],
-      "@Style/*": ["src/styles/*"]
+      "@Style/*": ["src/styles/*"],
+      "@Hook/*": ["src/hook/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

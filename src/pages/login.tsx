@@ -11,10 +11,10 @@ import type { NextPage, NextApiResponse } from 'next';
 import type { ChangeEvent, FocusEvent } from 'react';
 
 import { loginFn } from '@Controller';
-import { TLoginDto, TResData, TUser } from '@Type/user';
+import { TResData } from '@Type/user';
 
 const iDPattern = new RegExp('^[0-9|a-z|A-Z]{4,29}$');
-const pwdPattern = new RegExp('^.*(?=^.{8,29}$)(?=.*d)(?=.*[a-zA-Z])(?=.*[0-9]).*$');
+const pwdPattern = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,29}$');
 
 const LoginPage: NextPage = () => {
   const router = useRouter();

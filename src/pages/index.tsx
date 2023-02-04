@@ -5,10 +5,10 @@ import { Cookies } from 'react-cookie';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 
-import products from '../api/data/products.json';
-import ProductList from '../components/ProductList';
-import Pagination from '../components/Pagination';
-import Error from '../components/Error';
+import products from '@Api/data/products.json';
+import ProductList from '@Components/ProductList';
+import Pagination from '@Components/Pagination';
+import Error from '@Components/Error';
 
 import { userAtom } from '@Atom';
 

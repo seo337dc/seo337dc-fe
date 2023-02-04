@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 
-import { Product } from '../types/product';
+import { Product } from '@Type/product';
 
 type ProductItemProps = {
   product: Product;

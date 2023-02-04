@@ -9,7 +9,7 @@ const API_HOST = 'https://api.sixshop.com';
 
 const USER = {
   id: 'sixshop_001',
-  name: '김식스'
+  name: '김식스',
 };
 
 export const handlers = [
@@ -17,10 +17,11 @@ export const handlers = [
     return res(
       ctx.json({
         data: {
-          accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoic2l4c2hvcF8wMDEifX0.2Tm3R1A8dcIZdg3bfVxgHN9f36Ubolb6k1CKxAiL3QE',
+          accessToken:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoic2l4c2hvcF8wMDEifX0.2Tm3R1A8dcIZdg3bfVxgHN9f36Ubolb6k1CKxAiL3QE',
           user: USER,
-        }
-      }),
+        },
+      })
     );
   }),
 
@@ -32,9 +33,9 @@ export const handlers = [
         ctx.json({
           data: {
             user: USER,
-          }
-        }),
-      )
+          },
+        })
+      );
     }
 
     return res(
@@ -42,9 +43,9 @@ export const handlers = [
       ctx.json({
         error: {
           message: 'User not found',
-        }
-      }),
-    )
+        },
+      })
+    );
   }),
 
   rest.get(`${API_HOST}/products`, (req, res, ctx) => {
@@ -60,8 +61,8 @@ export const handlers = [
           data: {
             products: filteredProducts,
             totalCount: products.length,
-          }
-        }),
+          },
+        })
       );
     }
 
@@ -70,8 +71,8 @@ export const handlers = [
       ctx.json({
         error: {
           message: 'Products not found',
-        }
-      }),
+        },
+      })
     );
   }),
 
@@ -86,8 +87,8 @@ export const handlers = [
         ctx.json({
           data: {
             product: products[index],
-          }
-        }),
+          },
+        })
       );
     }
 
@@ -96,8 +97,8 @@ export const handlers = [
       ctx.json({
         error: {
           message: 'Product not found',
-        }
-      }),
+        },
+      })
     );
-  })
+  }),
 ];

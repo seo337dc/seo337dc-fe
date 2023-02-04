@@ -1,12 +1,26 @@
 import Link from 'next/link';
-import type { NextPage } from 'next';
-import React from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+
+import type { NextPage } from 'next';
+import type { Product } from '@Type/product';
 
 import products from '../../api/data/products.json';
 
+import Error from '../../components/Error';
+
 const ProductDetailPage: NextPage = () => {
-  const product = products[0];
+  const router = useRouter();
+
+  const [productData, setProductData] = useState<Product | null>(null);
+
+  useEffect(() => {
+    if (router.query.id) {
+      const findPrd = products.find((prd) => prd.id === router.query.id);
+      if (findPrd) setProductData(findPrd);
+    }
+  }, [router.query.id]);
 
   return (
     <>
@@ -18,11 +32,19 @@ const ProductDetailPage: NextPage = () => {
           <p>login</p>
         </Link>
       </Header>
-      <Thumbnail src={product.thumbnail ? product.thumbnail : '/defaultThumbnail.jpg'} />
-      <ProductInfoWrapper>
-        <Name>{product.name}</Name>
-        <Price>{product.price}원</Price>
-      </ProductInfoWrapper>
+      {productData ? (
+        <>
+          <Thumbnail
+            src={productData.thumbnail ? productData.thumbnail : '/defaultThumbnail.jpg'}
+          />
+          <ProductInfoWrapper>
+            <Name>{productData.name}</Name>
+            <Price>{productData.price.toLocaleString()}원</Price>
+          </ProductInfoWrapper>
+        </>
+      ) : (
+        <Error />
+      )}
     </>
   );
 };

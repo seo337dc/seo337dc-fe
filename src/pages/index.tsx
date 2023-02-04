@@ -1,16 +1,38 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import type { NextPage } from 'next';
-import React from 'react';
+import { useEffect } from 'react';
+import { Cookies } from 'react-cookie';
+import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import products from '../api/data/products.json';
 import ProductList from '../components/ProductList';
 import Pagination from '../components/Pagination';
 
+import { userAtom } from '@Atom';
+
+import type { NextPage, NextPageContext } from 'next';
+import type { TLoginDto, TUser } from '@Type/user';
+
+const cookies = new Cookies();
+
 const HomePage: NextPage = () => {
   const router = useRouter();
   const { page } = router.query;
+
+  const [user, setUser] = useRecoilState<TUser | null>(userAtom);
+
+  const handleLogout = () => {
+    cookies.remove('user');
+    setUser(null);
+  };
+
+  useEffect(() => {
+    if (cookies && cookies.get('user')) {
+      const userInfo = cookies.get('user') as TLoginDto;
+      setUser(userInfo.user);
+    }
+  }, [setUser]);
 
   return (
     <>
@@ -18,9 +40,16 @@ const HomePage: NextPage = () => {
         <Link href='/'>
           <Title>HAUS</Title>
         </Link>
-        <Link href='/login'>
-          <p>login</p>
-        </Link>
+        {user ? (
+          <div>
+            <p>{user.name}</p>
+            <LogoutBtn onClick={handleLogout}>logout</LogoutBtn>
+          </div>
+        ) : (
+          <Link href='/login'>
+            <p>login</p>
+          </Link>
+        )}
       </Header>
       <Container>
         <ProductList products={products.slice(0, 10)} />
@@ -48,4 +77,8 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 0 20px 40px;
+`;
+
+const LogoutBtn = styled.div`
+  cursor: pointer;
 `;

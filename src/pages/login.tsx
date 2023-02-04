@@ -1,24 +1,31 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import styled from 'styled-components';
+import { useCookies } from 'react-cookie';
 
-import type { NextPage } from 'next';
+import { AxiosResponse } from 'axios';
+
+import type { NextPage, NextApiResponse } from 'next';
 import type { ChangeEvent, FocusEvent } from 'react';
 
 import { loginFn } from '@Controller';
+import { TLoginDto, TResData, TUser } from '@Type/user';
 
 const iDPattern = new RegExp('^[0-9|a-z|A-Z]{4,29}$');
 const pwdPattern = new RegExp('^.*(?=^.{8,29}$)(?=.*d)(?=.*[a-zA-Z])(?=.*[0-9]).*$');
 
 const LoginPage: NextPage = () => {
   const router = useRouter();
+  const [cookies, setCookie] = useCookies(['user']);
 
   const loginMutate = useMutation({
     mutationFn: loginFn,
-    onSuccess: (result) => {
+    onSuccess: (result: AxiosResponse<TResData>) => {
       if (result.status === 200) {
+        const { data } = result.data;
+        setCookie('user', data); // 쿠키에 토큰 저장
         router.push('/');
       }
     },
@@ -65,6 +72,10 @@ const LoginPage: NextPage = () => {
     if (activeDesc.id && activeDesc.pwd) return true;
     return false;
   }, [activeDesc, input]);
+
+  useEffect(() => {
+    if (cookies.user) router.push('/');
+  }, [cookies.user, router]);
 
   return (
     <>

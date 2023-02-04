@@ -1,12 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type TProps = {
   data: any[];
   nowPage: number;
 };
 
+const initPageList = (nowPage: number, maxPage: number) => {
+  if (nowPage < 6) return [1, 2, 3, 4, 5];
+
+  const startPage = Math.floor(nowPage / 5) * 5;
+  let output = [];
+  for (let i = 0; i < 5; i++) {
+    output.push(startPage + i + 1);
+  }
+
+  if (nowPage >= maxPage) {
+    return output.filter((page) => page <= maxPage);
+  }
+
+  return output;
+};
+
 function usePagination({ data, nowPage }: TProps) {
   const [currentPage, setCurrentPage] = useState(nowPage || 1);
+
   const [pageList, setPageList] = useState<number[]>([1, 2, 3, 4, 5]);
 
   const outputItemCount = 10;
@@ -50,6 +67,11 @@ function usePagination({ data, nowPage }: TProps) {
     setCurrentPage((currentPage) => Math.min(pageNumber, maxPage));
   }
 
+  useEffect(() => {
+    setPageList(initPageList(nowPage, maxPage));
+    setCurrentPage(nowPage);
+  }, [maxPage, nowPage]);
+
   return {
     next,
     prev,
@@ -58,6 +80,7 @@ function usePagination({ data, nowPage }: TProps) {
     currentPage,
     maxPage,
     pageList,
+
     setCurrentPage,
   };
 }

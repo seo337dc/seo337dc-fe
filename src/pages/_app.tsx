@@ -6,8 +6,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AxiosError } from 'axios';
 import { RecoilRoot } from 'recoil';
 
-import setupMSW from '../api/setup';
-import GlobalStyle from '../styles/GlobalStyle';
+import setupMSW from '@Api/setup';
+import GlobalStyle from '@Style/GlobalStyle';
 
 setupMSW();
 

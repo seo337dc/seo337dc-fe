@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { Product } from '../types/product';
+import { Product } from '@Type/product';
 import ProductItem from './ProductItem';
 
 type ProductListProps = {

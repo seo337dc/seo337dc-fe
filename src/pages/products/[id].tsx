@@ -3,12 +3,12 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+import Error from '@Components/Error';
+
 import type { NextPage } from 'next';
 import type { Product } from '@Type/product';
 
-import products from '../../api/data/products.json';
-
-import Error from '../../components/Error';
+import products from '@Api/data/products.json';
 
 const ProductDetailPage: NextPage = () => {
   const router = useRouter();

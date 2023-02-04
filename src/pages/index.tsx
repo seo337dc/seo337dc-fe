@@ -13,14 +13,19 @@ import { userAtom } from '@Atom';
 
 import type { NextPage, NextPageContext } from 'next';
 import type { TLoginDto, TUser } from '@Type/user';
+import usePagination from '@Hook/usePagination';
 
 const cookies = new Cookies();
 
 const HomePage: NextPage = () => {
   const router = useRouter();
   const { page } = router.query;
-
   const [user, setUser] = useRecoilState<TUser | null>(userAtom);
+
+  const pagenation = usePagination({
+    data: products,
+    nowPage: Number(page) || 1,
+  });
 
   const handleLogout = () => {
     cookies.remove('user');
@@ -52,8 +57,14 @@ const HomePage: NextPage = () => {
         )}
       </Header>
       <Container>
-        <ProductList products={products.slice(0, 10)} />
-        <Pagination />
+        <ProductList products={pagenation.currentData()} />
+        <Pagination
+          pageList={pagenation.pageList}
+          nowPage={pagenation.currentPage}
+          setNowPage={pagenation.setCurrentPage}
+          next={pagenation.next}
+          prev={pagenation.prev}
+        />
       </Container>
     </>
   );

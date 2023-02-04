@@ -1,22 +1,34 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components';
 import { VscChevronLeft, VscChevronRight } from 'react-icons/vsc';
 
-const Pagination = () => {
+type TProps = {
+  pageList: number[];
+  nowPage: number;
+  setNowPage: Dispatch<SetStateAction<number>>;
+  next: () => void;
+  prev: () => void;
+};
+const Pagination = ({ pageList, nowPage, setNowPage, next, prev }: TProps) => {
   return (
     <Container>
-      <Button disabled>
-        <VscChevronLeft />
+      <Button disabled={pageList[0] === 1}>
+        <VscChevronLeft onClick={prev} />
       </Button>
       <PageWrapper>
-        {[1, 2, 3, 4, 5].map((page) => (
-          <Page key={page} selected={page === 1} disabled={page === 1}>
+        {pageList.map((page) => (
+          <Page
+            key={page}
+            selected={page === nowPage}
+            disabled={page === nowPage}
+            onClick={() => setNowPage(page)}
+          >
             {page}
           </Page>
         ))}
       </PageWrapper>
       <Button disabled={false}>
-        <VscChevronRight />
+        <VscChevronRight onClick={next} />
       </Button>
     </Container>
   );
@@ -55,6 +67,7 @@ const Page = styled.button<PageType>`
   background-color: ${({ selected }) => (selected ? '#000' : 'transparent')};
   color: ${({ selected }) => (selected ? '#fff' : '#000')};
   font-size: 20px;
+  cursor: pointer;
 
   & + & {
     margin-left: 4px;

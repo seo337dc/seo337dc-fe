@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import products from '../api/data/products.json';
 import ProductList from '../components/ProductList';
 import Pagination from '../components/Pagination';
+import Error from '../components/Error';
 
 import { userAtom } from '@Atom';
 
@@ -57,14 +58,20 @@ const HomePage: NextPage = () => {
         )}
       </Header>
       <Container>
-        <ProductList products={pagenation.currentData()} />
-        <Pagination
-          pageList={pagenation.pageList}
-          nowPage={pagenation.currentPage}
-          setNowPage={pagenation.setCurrentPage}
-          next={pagenation.next}
-          prev={pagenation.prev}
-        />
+        {pagenation.currentData().length > 0 ? (
+          <>
+            <ProductList products={pagenation.currentData()} />
+            <Pagination
+              pageList={pagenation.pageList}
+              nowPage={pagenation.currentPage}
+              setNowPage={pagenation.setCurrentPage}
+              next={pagenation.next}
+              prev={pagenation.prev}
+            />{' '}
+          </>
+        ) : (
+          <Error />
+        )}
       </Container>
     </>
   );

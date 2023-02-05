@@ -3,6 +3,12 @@ export type TUser = {
   name: string;
 };
 
+export type TUserDto = {
+  data: {
+    user: TUser;
+  };
+};
+
 export type TLoginDto = {
   accessToken: string;
   user: TUser;

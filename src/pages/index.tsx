@@ -19,6 +19,7 @@ import type { NextPage } from 'next';
 import type { AxiosResponse } from 'axios';
 import type { TLoginDto, TUser, TUserDto } from '@Type/user';
 import { TProductDto } from '@Type/product';
+import Loading from '@Components/Loading';
 
 const cookies = new Cookies();
 
@@ -27,7 +28,7 @@ const HomePage: NextPage = () => {
   const { page } = router.query;
   const userInfo = cookies.get('user') as TLoginDto | null | undefined;
 
-  const [nowPage, setNowPage] = useState<number>(Number(page));
+  const [nowPage, setNowPage] = useState<number>(Number(page) || 1);
 
   const [user, setUser] = useRecoilState<TUser | null>(userAtom);
 
@@ -40,7 +41,7 @@ const HomePage: NextPage = () => {
     },
   });
 
-  const { data } = useQuery<TProductDto>(
+  const { data, isLoading, error } = useQuery<TProductDto>(
     ['getProductList', nowPage],
     () => getProductList(nowPage),
     {}
@@ -49,6 +50,7 @@ const HomePage: NextPage = () => {
   const pagenation = usePagination({
     total: data?.data.totalCount || 0,
     nowPage,
+    setNowPage,
   });
 
   const handleLogout = () => {
@@ -78,20 +80,22 @@ const HomePage: NextPage = () => {
         )}
       </Header>
       <Container>
-        {data?.data ? (
-          <>
-            <ProductList products={data.data.products} />
-            <Pagination
-              pageList={pagenation.pageList}
-              nowPage={nowPage}
-              setNowPage={setNowPage}
-              next={pagenation.next}
-              prev={pagenation.prev}
-            />{' '}
-          </>
-        ) : (
-          <Error />
-        )}
+        <>
+          {data?.data && !error && (
+            <div>
+              <ProductList products={data.data.products} />
+              <Pagination
+                pageList={pagenation.pageList}
+                nowPage={nowPage}
+                setNowPage={setNowPage}
+                next={pagenation.next}
+                prev={pagenation.prev}
+              />{' '}
+            </div>
+          )}
+          {error && <Error />}
+          {isLoading && <Loading />}
+        </>
       </Container>
     </>
   );

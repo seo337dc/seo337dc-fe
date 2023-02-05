@@ -22,8 +22,6 @@ const ProductDetailPage: NextPage = () => {
     }
   );
 
-  console.log(error);
-
   return (
     <>
       <Header>

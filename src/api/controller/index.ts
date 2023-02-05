@@ -17,3 +17,7 @@ export const getProductList = (page: number) => {
   };
   return axios.get('https://api.sixshop.com/products', { params }).then((res) => res.data);
 };
+
+export const getProductDetail = (id: number) => {
+  return axios.get(`https://api.sixshop.com/products/${id}`).then((res) => res.data);
+};

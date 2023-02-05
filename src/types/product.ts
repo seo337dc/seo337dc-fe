@@ -5,6 +5,12 @@ export type Product = {
   price: number;
 };
 
+export type TProductDetailDto = {
+  data: {
+    product: Product;
+  };
+};
+
 export type TProductDto = {
   data: {
     products: Product[];

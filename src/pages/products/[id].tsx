@@ -1,26 +1,28 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 
 import Error from '@Components/Error';
+import Loading from '@Components/Loading';
 
 import type { NextPage } from 'next';
-import type { Product } from '@Type/product';
+import type { TProductDetailDto } from '@Type/product';
 
-import products from '@Api/data/products.json';
+import { getProductDetail } from '@Controller/index';
 
 const ProductDetailPage: NextPage = () => {
   const router = useRouter();
 
-  const [productData, setProductData] = useState<Product | null>(null);
-
-  useEffect(() => {
-    if (router.query.id) {
-      const findPrd = products.find((prd) => prd.id === router.query.id);
-      if (findPrd) setProductData(findPrd);
+  const { data, isLoading, error } = useQuery<TProductDetailDto>(
+    ['getProductDetail', router.query.id],
+    () => getProductDetail(Number(router.query.id)),
+    {
+      enabled: !!router.query.id,
     }
-  }, [router.query.id]);
+  );
+
+  console.log(error);
 
   return (
     <>
@@ -32,19 +34,21 @@ const ProductDetailPage: NextPage = () => {
           <p>login</p>
         </Link>
       </Header>
-      {productData ? (
+      {isLoading && <Loading />}
+      {data?.data && !error && (
         <>
           <Thumbnail
-            src={productData.thumbnail ? productData.thumbnail : '/defaultThumbnail.jpg'}
+            src={
+              data.data.product.thumbnail ? data.data.product.thumbnail : '/defaultThumbnail.jpg'
+            }
           />
           <ProductInfoWrapper>
-            <Name>{productData.name}</Name>
-            <Price>{productData.price.toLocaleString()}원</Price>
+            <Name>{data.data.product.name}</Name>
+            <Price>{data.data.product.price.toLocaleString()}원</Price>
           </ProductInfoWrapper>
         </>
-      ) : (
-        <Error />
       )}
+      {error && <Error />}
     </>
   );
 };

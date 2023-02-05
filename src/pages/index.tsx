@@ -1,9 +1,11 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Cookies } from 'react-cookie';
 import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
+
+import usePagination from '@Hook/usePagination';
 
 import products from '@Api/data/products.json';
 import ProductList from '@Components/ProductList';
@@ -11,17 +13,29 @@ import Pagination from '@Components/Pagination';
 import Error from '@Components/Error';
 
 import { userAtom } from '@Atom';
+import { getUserInfo } from '@Controller/index';
 
-import type { NextPage, NextPageContext } from 'next';
-import type { TLoginDto, TUser } from '@Type/user';
-import usePagination from '@Hook/usePagination';
+import type { NextPage } from 'next';
+import type { AxiosResponse } from 'axios';
+import type { TLoginDto, TUser, TUserDto } from '@Type/user';
 
 const cookies = new Cookies();
 
 const HomePage: NextPage = () => {
   const router = useRouter();
   const { page } = router.query;
+  const userInfo = cookies.get('user') as TLoginDto | null | undefined;
+
   const [user, setUser] = useRecoilState<TUser | null>(userAtom);
+
+  useQuery(['getUserInfo'], () => getUserInfo(userInfo?.user.id || ''), {
+    enabled: !!userInfo?.accessToken,
+    onSuccess: (result: AxiosResponse<TUserDto>) => {
+      if (result.status === 200) {
+        setUser(result.data.data.user);
+      }
+    },
+  });
 
   const pagenation = usePagination({
     data: products,
@@ -32,13 +46,6 @@ const HomePage: NextPage = () => {
     cookies.remove('user');
     setUser(null);
   };
-
-  useEffect(() => {
-    if (cookies && cookies.get('user')) {
-      const userInfo = cookies.get('user') as TLoginDto;
-      setUser(userInfo.user);
-    }
-  }, [setUser]);
 
   return (
     <>

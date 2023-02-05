@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useQuery } from '@tanstack/react-query';
+import { Cookies } from 'react-cookie';
+import { useRecoilState } from 'recoil';
 import styled from 'styled-components';
 
 import Error from '@Components/Error';
@@ -10,9 +12,16 @@ import type { NextPage } from 'next';
 import type { TProductDetailDto } from '@Type/product';
 
 import { getProductDetail } from '@Controller/index';
+import { userAtom } from '@Atom';
+import type { TUser, TLoginDto } from '@Type/user';
+import { useEffect } from 'react';
+
+const cookies = new Cookies();
 
 const ProductDetailPage: NextPage = () => {
   const router = useRouter();
+
+  const [user, setUser] = useRecoilState<TUser | null>(userAtom);
 
   const { data, isLoading, error } = useQuery<TProductDetailDto>(
     ['getProductDetail', router.query.id],
@@ -22,15 +31,34 @@ const ProductDetailPage: NextPage = () => {
     }
   );
 
+  const handleLogout = () => {
+    cookies.remove('user');
+    setUser(null);
+  };
+
+  useEffect(() => {
+    const userInfo = cookies.get('user') as TLoginDto | null | undefined;
+    if (userInfo && userInfo.accessToken) {
+      setUser(userInfo.user);
+    }
+  }, [cookies]);
+
   return (
     <>
       <Header>
         <Link href='/'>
           <Title>HAUS</Title>
         </Link>
-        <Link href='/login'>
-          <p>login</p>
-        </Link>
+        {user ? (
+          <div>
+            <p>{user.name}</p>
+            <LogoutBtn onClick={handleLogout}>logout</LogoutBtn>
+          </div>
+        ) : (
+          <Link href='/login'>
+            <p>login</p>
+          </Link>
+        )}
       </Header>
       {isLoading && <Loading />}
       {data?.data && !error && (
@@ -82,4 +110,8 @@ const Name = styled.div`
 const Price = styled.div`
   font-size: 18px;
   margin-top: 8px;
+`;
+
+const LogoutBtn = styled.div`
+  cursor: pointer;
 `;

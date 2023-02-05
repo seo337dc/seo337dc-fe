@@ -5,10 +5,9 @@ import { useMutation } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { useCookies } from 'react-cookie';
 
-import { AxiosResponse } from 'axios';
-
-import type { NextPage, NextApiResponse } from 'next';
+import type { NextPage } from 'next';
 import type { ChangeEvent, FocusEvent } from 'react';
+import type { AxiosResponse } from 'axios';
 
 import { loginFn } from '@Controller';
 import { TResData } from '@Type/user';

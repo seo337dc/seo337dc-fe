@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 
 type TProps = {
   total: number;
   nowPage: number;
+  setNowPage: Dispatch<SetStateAction<number>>;
 };
 
 const initPageList = (nowPage: number, maxPage: number) => {
@@ -21,26 +23,18 @@ const initPageList = (nowPage: number, maxPage: number) => {
   return output;
 };
 
-function usePagination({ nowPage, total }: TProps) {
-  const [currentPage, setCurrentPage] = useState(nowPage || 1);
-
+function usePagination({ nowPage, total, setNowPage }: TProps) {
   const [pageList, setPageList] = useState<number[]>([1, 2, 3, 4, 5]);
 
   const outputItemCount = 10;
   const maxPage = Math.ceil(total / outputItemCount);
-
-  // function currentData() {
-  //   const begin = (currentPage - 1) * outputItemCount;
-  //   const end = begin + outputItemCount;
-  //   return data.slice(begin, end);
-  // }
 
   function next() {
     const result = pageList
       .map((pageData) => pageData + 5)
       .filter((pageData) => pageData <= maxPage);
     setPageList(result);
-    setCurrentPage(result[0]);
+    setNowPage(result[0]);
   }
 
   function prev() {
@@ -53,34 +47,29 @@ function usePagination({ nowPage, total }: TProps) {
         outputPage.push(lastPrevPageNum - i + 1);
       }
       setPageList(outputPage);
-      setCurrentPage(outputPage[0]);
+      setNowPage(outputPage[0]);
     } else {
       const result = pageList.map((pageData) => pageData - 5);
       setPageList(result);
-      setCurrentPage(result[0]);
+      setNowPage(result[0]);
     }
   }
 
   function jump(page: number) {
     const pageNumber = Math.max(1, page);
-    setCurrentPage((currentPage) => Math.min(pageNumber, maxPage));
+    setNowPage(Math.min(pageNumber, maxPage));
   }
 
   useEffect(() => {
     setPageList(initPageList(nowPage, maxPage));
-    setCurrentPage(nowPage);
-  }, [maxPage, nowPage]);
+    setNowPage(nowPage);
+  }, [nowPage, maxPage]);
 
   return {
     next,
     prev,
     jump,
-    // currentData,
-    currentPage,
-    maxPage,
     pageList,
-
-    setCurrentPage,
   };
 }
 export default usePagination;

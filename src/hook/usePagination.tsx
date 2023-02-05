@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 type TProps = {
-  data: any[];
+  total: number;
   nowPage: number;
 };
 
@@ -21,20 +21,19 @@ const initPageList = (nowPage: number, maxPage: number) => {
   return output;
 };
 
-function usePagination({ data, nowPage }: TProps) {
+function usePagination({ nowPage, total }: TProps) {
   const [currentPage, setCurrentPage] = useState(nowPage || 1);
 
   const [pageList, setPageList] = useState<number[]>([1, 2, 3, 4, 5]);
 
   const outputItemCount = 10;
-  const total = data.length;
   const maxPage = Math.ceil(total / outputItemCount);
 
-  function currentData() {
-    const begin = (currentPage - 1) * outputItemCount;
-    const end = begin + outputItemCount;
-    return data.slice(begin, end);
-  }
+  // function currentData() {
+  //   const begin = (currentPage - 1) * outputItemCount;
+  //   const end = begin + outputItemCount;
+  //   return data.slice(begin, end);
+  // }
 
   function next() {
     const result = pageList
@@ -76,7 +75,7 @@ function usePagination({ data, nowPage }: TProps) {
     next,
     prev,
     jump,
-    currentData,
+    // currentData,
     currentPage,
     maxPage,
     pageList,

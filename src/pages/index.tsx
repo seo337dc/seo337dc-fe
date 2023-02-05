@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Cookies } from 'react-cookie';
 import { useRecoilState } from 'recoil';
@@ -7,17 +8,17 @@ import styled from 'styled-components';
 
 import usePagination from '@Hook/usePagination';
 
-import products from '@Api/data/products.json';
 import ProductList from '@Components/ProductList';
 import Pagination from '@Components/Pagination';
 import Error from '@Components/Error';
 
 import { userAtom } from '@Atom';
-import { getUserInfo } from '@Controller/index';
+import { getUserInfo, getProductList } from '@Controller/index';
 
 import type { NextPage } from 'next';
 import type { AxiosResponse } from 'axios';
 import type { TLoginDto, TUser, TUserDto } from '@Type/user';
+import { TProductDto } from '@Type/product';
 
 const cookies = new Cookies();
 
@@ -25,6 +26,8 @@ const HomePage: NextPage = () => {
   const router = useRouter();
   const { page } = router.query;
   const userInfo = cookies.get('user') as TLoginDto | null | undefined;
+
+  const [nowPage, setNowPage] = useState<number>(Number(page));
 
   const [user, setUser] = useRecoilState<TUser | null>(userAtom);
 
@@ -37,15 +40,25 @@ const HomePage: NextPage = () => {
     },
   });
 
+  const { data } = useQuery<TProductDto>(
+    ['getProductList', nowPage],
+    () => getProductList(nowPage),
+    {}
+  );
+
   const pagenation = usePagination({
-    data: products,
-    nowPage: Number(page) || 1,
+    total: data?.data.totalCount || 0,
+    nowPage,
   });
 
   const handleLogout = () => {
     cookies.remove('user');
     setUser(null);
   };
+
+  useEffect(() => {
+    if (page) setNowPage(Number(page));
+  }, [page]);
 
   return (
     <>
@@ -65,13 +78,13 @@ const HomePage: NextPage = () => {
         )}
       </Header>
       <Container>
-        {pagenation.currentData().length > 0 ? (
+        {data?.data ? (
           <>
-            <ProductList products={pagenation.currentData()} />
+            <ProductList products={data.data.products} />
             <Pagination
               pageList={pagenation.pageList}
-              nowPage={pagenation.currentPage}
-              setNowPage={pagenation.setCurrentPage}
+              nowPage={nowPage}
+              setNowPage={setNowPage}
               next={pagenation.next}
               prev={pagenation.prev}
             />{' '}
